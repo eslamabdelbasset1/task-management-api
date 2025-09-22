@@ -1,61 +1,250 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# 🚀 Task Management REST API
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+**Laravel-based clean code REST API demonstrating senior-level backend development practices.**
 
-## About Laravel
+## Quick Start
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+### 1. Project Setup
+```bash
+# Create new Laravel project
+composer create-project laravel/laravel task-management
+cd task-management
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+# Install additional dependencies
+composer require laravel/sanctum
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+# Copy environment file and generate key
+cp .env.example .env
+php artisan key:generate
+```
 
-## Learning Laravel
+### 2. Environment Configuration
+Create `.env` file with database configuration:
+```env
+APP_NAME="Task Management API"
+APP_ENV=local
+APP_KEY=base64:your-generated-key-here
+APP_DEBUG=true
+APP_URL=http://localhost:8000
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+DB_CONNECTION=mysql
+DB_HOST=127.0.0.1
+DB_PORT=3306
+DB_DATABASE=task_management
+DB_USERNAME=root
+DB_PASSWORD=
 
-You may also try the [Laravel Bootcamp](https://bootcamp.laravel.com), where you will be guided through building a modern Laravel application from scratch.
+CACHE_DRIVER=file
+QUEUE_CONNECTION=sync
+```
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+### 3. Database Setup
+```bash
+# Create database
+mysql -u root -p -e "CREATE DATABASE task_management;"
 
-## Laravel Sponsors
+# Run migrations and seed data
+php artisan migrate
+php artisan db:seed
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
+# Start development server
+php artisan serve
+```
 
-### Premium Partners
+## 📋 API Endpoints
 
-- **[Vehikl](https://vehikl.com)**
-- **[Tighten Co.](https://tighten.co)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Redberry](https://redberry.international/laravel-development)**
-- **[Active Logic](https://activelogic.com)**
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| `GET` | `/api/tasks` | List all tasks (with filtering & pagination) |
+| `POST` | `/api/tasks` | Create new task |
+| `GET` | `/api/tasks/{id}` | Get single task |
+| `PATCH` | `/api/tasks/{id}/toggle` | Toggle task completion status |
+| `GET` | `/api/categories` | List all categories with stats |
 
-## Contributing
+## 🔧 Query Parameters
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+**Tasks Filtering:**
+- `?completed=true|false` - Filter by completion status
+- `?priority=low|medium|high` - Filter by priority level
+- `?category_id=1` - Filter by category ID
 
-## Code of Conduct
+**Example:** `/api/tasks?completed=false&priority=high&category_id=1`
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+## 📝 Request Examples
 
-## Security Vulnerabilities
+### Create Task
+```bash
+curl -X POST "http://localhost:8000/api/tasks" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "title": "Complete project documentation",
+    "description": "Write comprehensive API documentation",
+    "category_id": 1,
+    "priority": "high"
+  }'
+```
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+### Get All Tasks
+```bash
+curl -X GET "http://localhost:8000/api/tasks" \
+  -H "Accept: application/json"
+```
 
-## License
+## 🏗️ Database Schema
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+### Categories
+- `id`, `name` (unique), `color` (hex), `timestamps`
+
+### Tasks
+- `id`, `title`, `description`, `category_id` (FK), `priority` (enum), `completed` (boolean), `image_url`, `timestamps`
+
+## ✅ Advanced Features
+
+- **Clean Architecture** - Service layer separation, base controllers
+- **Database Optimization** - Strategic indexes, eager loading, N+1 prevention
+- **Validation & Security** - Custom form requests, SQL injection prevention
+- **Error Handling** - Global API exception handling
+- **Testing** - Comprehensive feature test coverage
+- **Auto-Generated URLs** - Dynamic image URLs (`https://picsum.photos/seed/task{id}/400/300`)
+- **API Resources** - Consistent JSON formatting
+- **Pagination** - Built-in Laravel pagination for large datasets
+
+## 🧪 Running Tests
+
+### Execute All Tests
+
+Update `.env` file:
+```env
+APP_NAME="Task Management API"
+APP_ENV=testing
+```
+
+```bash
+# Run all tests
+php artisan test
+
+# Run specific test file
+php artisan test tests/Feature/TaskApiTest.php
+
+# Run tests with coverage
+php artisan test --coverage
+
+# Run tests in parallel
+php artisan test --parallel
+
+
+PASS  Tests\Feature\TaskApiTest
+✓ can list tasks
+✓ can create task
+✓ can show single task
+✓ can toggle task status
+
+PASS  Tests\Feature\CategoryApiTest
+✓ can list categories
+✓ categories include task counts
+
+Tests:  6 passed
+Time:   0.45s
+```
+
+## 📊 Sample Response
+
+```json
+{
+  "success": true,
+  "message": "Tasks retrieved successfully",
+  "data": {
+    "tasks": [
+      {
+        "id": 1,
+        "title": "Complete project documentation",
+        "description": "Write comprehensive API documentation",
+        "priority": "high",
+        "priority_formatted": "High",
+        "completed": false,
+        "image_url": "https://picsum.photos/seed/task1/400/300",
+        "created_at": "2025-09-22T10:30:00.000000Z",
+        "updated_at": "2025-09-22T10:30:00.000000Z",
+        "category": {
+          "id": 1,
+          "name": "Work",
+          "color": "#3B82F6",
+          "created_at": "2025-09-22T10:00:00.000000Z"
+        }
+      }
+    ],
+    "pagination": {
+      "current_page": 1,
+      "last_page": 1,
+      "per_page": 15,
+      "total": 1
+    }
+  }
+}
+```
+
+## 🔧 Development Commands
+
+```bash
+# Generate fresh test data
+php artisan migrate:fresh --seed
+
+# Clear all caches
+php artisan optimize:clear
+
+# Generate API documentation
+php artisan ide-helper:generate
+php artisan ide-helper:models
+
+# Code analysis
+./vendor/bin/phpstan analyse
+./vendor/bin/php-cs-fixer fix
+```
+
+## 🚀 Production Deployment
+
+```bash
+# Optimize for production
+composer install --optimize-autoloader --no-dev
+php artisan config:cache
+php artisan route:cache
+php artisan view:cache
+
+# Set production environment
+APP_ENV=production
+APP_DEBUG=false
+```
+
+## 📚 Key Files Structure
+
+```
+app/
+├── Http/
+│   ├── Controllers/Api/
+│   │   ├── BaseController.php
+│   │   ├── TaskController.php
+│   │   └── CategoryController.php
+│   ├── Requests/
+│   │   └── StoreTaskRequest.php
+│   └── Resources/
+│       ├── TaskResource.php
+│       └── CategoryResource.php
+├── Models/
+│   ├── Task.php
+│   └── Category.php
+└── Exceptions/
+    └── Handler.php
+
+database/
+├── migrations/
+├── factories/
+└── seeders/
+
+tests/
+└── Feature/
+    ├── TaskApiTest.php
+    └── CategoryApiTest.php
+```
+
+This implementation showcases **production-ready Laravel API development** with clean code principles, 
+comprehensive testing, and advanced features suitable for senior backend developer roles.
